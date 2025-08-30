@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,13 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-export default function page() {
+export default function Page() {
   const [value, setValue] = useState("");
   const [fromUnit, setFromUnit] = useState("kg");
   const [toUnit, setToUnit] = useState("lb");
   const [result, setResult] = useState(null);
 
-  // Conversion factors (to kilograms)
+  // Conversion factors relative to kilograms
   const conversion = {
     kg: 1,
     lb: 0.453592,
@@ -25,8 +26,8 @@ export default function page() {
 
   const handleConvert = () => {
     if (!value) return;
-    const inKg = parseFloat(value) * conversion[fromUnit];
-    const converted = inKg / conversion[toUnit];
+    const inKg = parseFloat(value) * conversion[fromUnit]; // convert input to kg
+    const converted = inKg / conversion[toUnit]; // convert kg to target unit
     setResult(converted.toFixed(4));
   };
 
@@ -38,7 +39,7 @@ export default function page() {
 
       <Card className="card-hover max-w-xl mx-auto">
         <CardContent className="p-6 flex flex-col gap-6">
-          {/* Input */}
+          {/* Input & From Unit */}
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <Input
               type="number"
@@ -50,7 +51,7 @@ export default function page() {
 
             <Select value={fromUnit} onValueChange={setFromUnit}>
               <SelectTrigger className="w-28">
-                <SelectValue />
+                <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="kg">kg</SelectItem>
@@ -64,7 +65,7 @@ export default function page() {
             <span className="font-medium">Convert to:</span>
             <Select value={toUnit} onValueChange={setToUnit}>
               <SelectTrigger className="w-28">
-                <SelectValue />
+                <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="kg">kg</SelectItem>
@@ -73,7 +74,7 @@ export default function page() {
             </Select>
           </div>
 
-          {/* Button */}
+          {/* Convert Button */}
           <Button onClick={handleConvert} className="bg-primary text-white">
             Convert
           </Button>
