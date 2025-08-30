@@ -29,9 +29,9 @@ export default function Page() {
         .replace(/log/gi, "Math.log10")
         .replace(/ln/gi, "Math.log")
         .replace(/√/g, "Math.sqrt")
-        .replace(/\^/g, "");
+        .replace(/\^/g, "**"); // ✅ use power operator
 
-      const evalResult = eval(exp); // ⚠ Controlled environment only
+      const evalResult = eval(exp); // ⚠ controlled environment only
       setResult(evalResult);
     } catch (error) {
       setResult("Error");
@@ -80,7 +80,7 @@ export default function Page() {
       return "bg-purple-600 text-white hover:bg-purple-700";
     if (["π", "e"].includes(btn))
       return "bg-amber-600 text-white hover:bg-amber-700";
-    return "bg-gray-200 hover:bg-gray-300"; // default for numbers & others
+    return "bg-gray-200 hover:bg-gray-300";
   };
 
   return (

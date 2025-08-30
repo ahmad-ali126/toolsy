@@ -20,7 +20,7 @@ export default function MarkdownEditor() {
   const previewRef = useRef(null);
   const filenameRef = useRef("note");
 
-  // Try to dynamically import marked + DOMPurify for robust rendering
+  // Dynamic import of marked + DOMPurify if available
   useEffect(() => {
     let cancelled = false;
     async function loadAndRender() {
@@ -32,8 +32,7 @@ export default function MarkdownEditor() {
         const clean = DOMPurify.sanitize(rendered);
         setHtml(clean);
         setPreviewReady(true);
-      } catch (err) {
-        // If imports fail (packages not installed), use a simple fallback converter
+      } catch {
         const fallback = simpleMarkdownToHtml(md);
         setHtml(fallback);
         setPreviewReady(true);
@@ -46,61 +45,53 @@ export default function MarkdownEditor() {
     };
   }, [md]);
 
-  // Very small fallback markdown -> HTML (handles headings, bold, italic, code blocks, lists, links)
+  // Fallback markdown parser
   function simpleMarkdownToHtml(input) {
     if (!input) return "";
     let out = input
-      // code blocks
       .replace(
         /```([\s\S]*?)```/g,
         (m, p1) => `<pre><code>${escapeHtml(p1)}</code></pre>`
       )
-      // inline code
       .replace(/`([^`]+)`/g, (m, p1) => `<code>${escapeHtml(p1)}</code>`)
-      // headings
       .replace(/^###### (.*$)/gim, "<h6>$1</h6>")
       .replace(/^##### (.*$)/gim, "<h5>$1</h5>")
       .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
       .replace(/^### (.*$)/gim, "<h3>$1</h3>")
       .replace(/^## (.*$)/gim, "<h2>$1</h2>")
       .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-      // bold & italic
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      // blockquote
       .replace(/^\> (.*$)/gim, "<blockquote>$1</blockquote>")
-      // unordered list
       .replace(/^\s*[-\*\+] (.*)/gim, "<li>$1</li>")
       .replace(/(<li>.*<\/li>)/gim, "<ul>$1</ul>")
-      // links
       .replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank" rel="noreferrer">$1</a>'
       )
-      // paragraphs
       .replace(/^\s*([\s\S]+?)\s*$/gm, (m, p1) => {
-        // If block-level already present, keep it
         if (/^(<h|<ul|<ol|<pre|<blockquote|<img|<p|<div)/.test(p1.trim()))
           return p1;
         return `<p>${p1.trim()}</p>`;
       });
-
     return out;
   }
 
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, function (m) {
-      return {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[m];
-    });
+    return s.replace(
+      /[&<>"']/g,
+      (m) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[m])
+    );
   }
 
-  // Toolbar helpers
+  // Text wrapping helpers
   function wrapSelection(prefix, suffix = prefix) {
     const el = editorRef.current;
     if (!el) return;
@@ -111,8 +102,6 @@ export default function MarkdownEditor() {
     const after = md.slice(end);
     const newText = before + prefix + selection + suffix + after;
     setMd(newText);
-
-    // restore selection (place cursor inside wrapped text)
     const cursor = start + prefix.length + selection.length + suffix.length;
     requestAnimationFrame(() => {
       el.focus();
@@ -129,7 +118,6 @@ export default function MarkdownEditor() {
     const after = md.slice(end);
     const newText = before + textToInsert + after;
     setMd(newText);
-
     const pos = start + textToInsert.length;
     requestAnimationFrame(() => {
       el.focus();
@@ -137,7 +125,7 @@ export default function MarkdownEditor() {
     });
   }
 
-  // Downloads
+  // Download helpers
   function downloadFile(content, name, mime = "text/markdown") {
     const blob = new Blob([content], { type: mime });
     const url = URL.createObjectURL(blob);
@@ -153,6 +141,7 @@ export default function MarkdownEditor() {
   function handleDownloadMd() {
     downloadFile(md, `${filenameRef.current || "note"}.md`, "text/markdown");
   }
+
   function handleDownloadHtml() {
     const fullHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(
       filenameRef.current || "note"
@@ -180,7 +169,7 @@ export default function MarkdownEditor() {
       .catch(() => alert("Copy failed."));
   }
 
-  // Simple toggle insert helpers
+  // Insert link/image
   function addLink() {
     const url = prompt("Enter URL", "https://");
     if (!url) return;
@@ -194,7 +183,7 @@ export default function MarkdownEditor() {
     insertAtCursor(`![alt text](${url})`);
   }
 
-  // Sync scroll: when preview shown, keep ratio approx same
+  // Sync scroll editor ↔ preview
   const syncScroll = (e) => {
     if (!previewRef.current || !editorRef.current) return;
     const ratio =
@@ -214,7 +203,7 @@ export default function MarkdownEditor() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* meta row */}
+          {/* Top controls */}
           <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <Input
@@ -224,7 +213,7 @@ export default function MarkdownEditor() {
                 className="max-w-xs"
               />
               <Button onClick={() => setSplit((s) => !s)} variant="ghost">
-                <Eye className="mr-2 h-4 w-4" />{" "}
+                <Eye className="mr-2 h-4 w-4" />
                 {split ? "Toggle Single" : "Split View"}
               </Button>
             </div>
@@ -245,7 +234,7 @@ export default function MarkdownEditor() {
             </div>
           </div>
 
-          {/* toolbar */}
+          {/* Toolbar */}
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => wrapSelection("**")}>Bold</Button>
             <Button onClick={() => wrapSelection("*")}>Italic</Button>
@@ -265,7 +254,7 @@ export default function MarkdownEditor() {
             </Button>
           </div>
 
-          {/* editor + preview */}
+          {/* Editor + Preview */}
           <div
             className={`grid ${
               split ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
@@ -288,9 +277,7 @@ export default function MarkdownEditor() {
               </Label>
               <div
                 ref={previewRef}
-                onScroll={() => {}}
                 className="min-h-[360px] p-4 bg-card rounded-md overflow-auto prose max-w-none"
-                // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </div>
@@ -299,8 +286,7 @@ export default function MarkdownEditor() {
           <div className="text-sm text-muted-foreground">
             Tip: For best rendering install <code>marked</code> and{" "}
             <code>dompurify</code>:
-            <code className="ml-2">npm i marked dompurify</code>. The editor
-            will auto-use them if present.
+            <code className="ml-2">npm i marked dompurify</code>.
           </div>
         </CardContent>
       </Card>

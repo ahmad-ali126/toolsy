@@ -18,7 +18,7 @@ export default function ImageConverterPage() {
   const [file, setFile] = useState(null);
   const [src, setSrc] = useState(null);
   const [format, setFormat] = useState("image/png");
-  const [quality, setQuality] = useState(0.9); // 0.0 - 1.0 (for jpeg/webp)
+  const [quality, setQuality] = useState(0.9); // 0.0 - 1.0
   const [busy, setBusy] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadName, setDownloadName] = useState("converted-image");
@@ -39,19 +39,20 @@ export default function ImageConverterPage() {
   };
 
   const onFileChange = (e) => {
-    const f = e.target.files?.[0] ?? null;
+    const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
     handleFile(f);
   };
 
   // Drag & drop handlers
   const onDrop = (e) => {
     e.preventDefault();
-    const f = e.dataTransfer.files?.[0] ?? null;
+    const f =
+      e.dataTransfer.files && e.dataTransfer.files[0]
+        ? e.dataTransfer.files[0]
+        : null;
     handleFile(f);
   };
-  const onDragOver = (e) => {
-    e.preventDefault();
-  };
+  const onDragOver = (e) => e.preventDefault();
 
   // Convert using canvas
   const convertImage = async () => {
@@ -66,26 +67,22 @@ export default function ImageConverterPage() {
         img.onerror = (err) => rej(err);
       });
 
-      // Draw on canvas
       const canvas = document.createElement("canvas");
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas not supported");
 
-      // If target is jpeg (no alpha), fill with white
       if (format === "image/jpeg") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
       ctx.drawImage(img, 0, 0);
 
-      // Compose filename + mime
       const mime = format;
       const ext =
         mime === "image/png" ? "png" : mime === "image/jpeg" ? "jpg" : "webp";
 
-      // toBlob for download
       await new Promise((resolve, reject) => {
         const q = Math.max(0, Math.min(1, quality));
         canvas.toBlob(
@@ -161,18 +158,16 @@ export default function ImageConverterPage() {
                   WebP, etc.)
                 </p>
                 <Button
-                  onClick={() =>
-                    document.getElementById("image-input")?.click()
-                  }
+                  onClick={() => document.getElementById("image-input").click()}
                 >
                   Choose Image
                 </Button>
               </div>
             </label>
+
             {src && (
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 <div className="flex justify-center">
-                  {/* small preview */}
                   <img
                     ref={imgRef}
                     src={src}
@@ -204,13 +199,12 @@ export default function ImageConverterPage() {
                           JPEG / JPG (lossy)
                         </SelectItem>
                         <SelectItem value="image/webp">
-                          WebP (modern: lossy or lossless)
+                          WebP (modern)
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {/* Quality slider */}
                   <div className="space-y-1">
                     <Label>Quality ({Math.round(quality * 100)}%)</Label>
                     <div className="flex items-center gap-4">
@@ -227,8 +221,8 @@ export default function ImageConverterPage() {
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Quality applies to JPEG and WebP. PNG is lossless and will
-                      ignore quality.
+                      Quality applies to JPEG and WebP. PNG is lossless and
+                      ignores quality.
                     </p>
                   </div>
                 </div>
@@ -248,7 +242,6 @@ export default function ImageConverterPage() {
             >
               Clear
             </Button>
-
             <Button
               variant="ghost"
               onClick={handleDownload}
@@ -258,7 +251,6 @@ export default function ImageConverterPage() {
             </Button>
           </div>
 
-          {/* Download preview / link */}
           {downloadUrl && (
             <div className="text-center mt-2">
               <p className="text-sm">

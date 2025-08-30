@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { PopularTools } from "../components/PopularTools";
 import { ToolCategories } from "../components/ToolCategory";
 import { FaqSection } from "../components/faqSection";
