@@ -1,0 +1,141 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap");
+
+@import "tailwindcss";
+:root {
+  /* New Color Palette */
+  --primary: 221 83% 53%; /* Vibrant blue for primary actions */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 40% 96%; /* Light blue-gray for secondary elements */
+  --secondary-foreground: 222 47% 11%;
+
+  --accent: 202 80% 52%; /* Bright blue for accents */
+  --accent-foreground: 0 0% 100%;
+
+  --muted: 210 40% 98%; /* Very light blue for muted backgrounds */
+  --muted-foreground: 215 16% 47%;
+
+  --background: 0 0% 100%; /* White background */
+  --foreground: 222 47% 11%; /* Almost black for text */
+
+  --card: 0 0% 100%; /* White cards */
+  --card-foreground: 222 47% 11%;
+
+  --popover: 0 0% 100%; /* White popovers */
+  --popover-foreground: 222 47% 11%;
+
+  --border: 214 32% 91%; /* Light gray border */
+  --input: 214 32% 91%; /* Light gray inputs */
+  --ring: 221 83% 53%; /* Primary color ring */
+
+  --success: 142 72% 45%; /* Green for success states */
+  --warning: 38 92% 50%; /* Amber for warnings */
+  --destructive: 0 84% 60%; /* Red for destructive actions */
+
+  --radius: 0.5rem; /* Border radius */
+
+  /* Tool category colors */
+  --calculator: 202 80% 52%; /* Blue for calculators */
+  --text-tools: 271 81% 56%; /* Purple for text tools */
+  --converters: 142 72% 45%; /* Green for converters */
+  --generators: 38 92% 50%; /* Amber for generators */
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--primary));
+  --color-chart-2: hsl(var(--accent));
+  --color-chart-3: hsl(142 72% 45%);
+  --color-chart-4: hsl(38 92% 50%);
+  --color-chart-5: hsl(271 81% 56%);
+  --color-sidebar: hsl(210 40% 98%);
+  --color-sidebar-foreground: hsl(222 47% 11%);
+  --color-sidebar-primary: hsl(var(--primary));
+  --color-sidebar-primary-foreground: hsl(var(--primary-foreground));
+  --color-sidebar-accent: hsl(var(--accent));
+  --color-sidebar-accent-foreground: hsl(var(--accent-foreground));
+  --color-sidebar-border: hsl(214 32% 91%);
+  --color-sidebar-ring: hsl(var(--ring));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .poetsen {
+    font-family: "Poetsen One", sans-serif !important;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+  }
+
+  /* Tool category backgrounds */
+  .bg-calculator {
+    background-color: hsl(var(--calculator));
+  }
+  .bg-text-tools {
+    background-color: hsl(var(--text-tools));
+  }
+  .bg-converters {
+    background-color: hsl(var(--converters));
+  }
+  .bg-generators {
+    background-color: hsl(var(--generators));
+  }
+}
+
+.container-box {
+  @apply px-4 py-8 md:px-6 md:py-12 lg:px-8 lg:py-8 max-w-7xl mx-auto;
+}
+
+.section-spacing {
+  @apply py-12 md:py-16 lg:py-24;
+}
